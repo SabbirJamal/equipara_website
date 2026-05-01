@@ -193,8 +193,8 @@ export default function SellerDashboard() {
                     <div className={styles.actions}>
                       <button
                         className={styles.actionBtn}
-                        onClick={() => router.push(`/listing/${listing.id}`)}
-                        title="View"
+                        onClick={() => router.push(`/listing/${listing.id}/edit`)}
+                        title="Edit"
                       >
                         <Edit className="w-4 h-4" />
                       </button>
