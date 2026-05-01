@@ -1,0 +1,45 @@
+import { NextResponse, type NextRequest } from 'next/server'
+
+export function middleware(request: NextRequest) {
+  // protected routes that require login
+  const protectedPaths = ['/dashboard', '/become-seller', '/add-listing']
+  const isProtectedPath = protectedPaths.some(path =>
+    request.nextUrl.pathname.startsWith(path)
+  )
+
+  // auth pages (login, signup) - redirect to dashboard if logged in
+  const authPaths = ['/login', '/signup']
+  const isAuthPath = authPaths.some(path =>
+    request.nextUrl.pathname.startsWith(path)
+  )
+
+  // check if user has supabase auth cookies
+  const cookies = request.cookies.getAll()
+  const hasAuthToken = cookies.some(c => 
+    c.name.startsWith('sb-') && c.name.endsWith('-auth-token')
+  )
+
+  // if trying to access protected route without auth, redirect to login
+  if (isProtectedPath && !hasAuthToken) {
+    console.log('middleware: no auth, redirecting to login')
+    const url = request.nextUrl.clone()
+    url.pathname = '/login'
+    return NextResponse.redirect(url)
+  }
+
+  // if logged in and trying to access login/signup, redirect to dashboard
+  if (isAuthPath && hasAuthToken) {
+    console.log('middleware: already logged in, redirecting to dashboard')
+    const url = request.nextUrl.clone()
+    url.pathname = '/dashboard'
+    return NextResponse.redirect(url)
+  }
+
+  return NextResponse.next()
+}
+
+export const config = {
+  matcher: [
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+  ],
+}
