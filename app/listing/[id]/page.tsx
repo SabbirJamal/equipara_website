@@ -6,7 +6,8 @@ import Link from 'next/link';
 import { supabase } from '@/lib/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import SmartHeader from '@/components/layout/SmartHeader';
-import { MapPin, Calendar, ArrowLeft, Phone, Building2, Edit } from 'lucide-react';
+import RequestFormModal from '@/components/booking/RequestFormModal';
+import { MapPin, Calendar, ArrowLeft, Phone, Building2 } from 'lucide-react';
 import styles from './page.module.css';
 
 interface ListingDetail {
@@ -47,6 +48,7 @@ export default function ListingDetailPage() {
   const [listing, setListing] = useState<ListingDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedPhoto, setSelectedPhoto] = useState(0);
+  const [showRequestForm, setShowRequestForm] = useState(false);
 
   useEffect(() => {
     const loadListing = async () => {
@@ -64,12 +66,6 @@ export default function ListingDetailPage() {
       loadListing();
     }
   }, [id]);
-
-  // check if current user is the seller who owns this listing
-  const isOwner = user && profile?.is_seller && listing && (() => {
-    // we need to check if this listing belongs to the current user's seller profile
-    return true; // simplified for now - we'll check properly later
-  })();
 
   const handleBack = () => {
     if (window.history.length > 1) {
@@ -96,6 +92,13 @@ export default function ListingDetailPage() {
       'transmission': 'Transmission',
       'fork_length_mm': 'Fork Length',
       'neck_type': 'Neck Type',
+      'capacity_liters': 'Tank Capacity',
+      'material': 'Material',
+      'power_kva': 'Power Output',
+      'operating_weight_tons': 'Operating Weight',
+      'bucket_capacity_m3': 'Bucket Capacity',
+      'max_dig_depth_meters': 'Max Dig Depth',
+      'bed_length_ft': 'Bed Length',
     };
     return labels[key] || key.replace(/_/g, ' ');
   };
@@ -112,6 +115,12 @@ export default function ListingDetailPage() {
       'fork_length_mm': 'mm',
       'outreach_meters': 'm',
       'horsepower': 'HP',
+      'capacity_liters': 'liters',
+      'power_kva': 'kVA',
+      'operating_weight_tons': 'tons',
+      'bucket_capacity_m3': 'm³',
+      'max_dig_depth_meters': 'm',
+      'bed_length_ft': 'ft',
     };
     return units[key] || '';
   };
@@ -152,7 +161,6 @@ export default function ListingDetailPage() {
       <SmartHeader />
       
       <div className={styles.container}>
-        {/* back button */}
         <div className={styles.topBar}>
           <button onClick={handleBack} className={styles.backBtn}>
             <ArrowLeft className="w-5 h-5" />
@@ -193,7 +201,7 @@ export default function ListingDetailPage() {
           {/* right: details */}
           <div className={styles.detailsSection}>
             <span className={styles.categoryBadge}>
-              {listing.sub_type?.replace('_', ' ')}
+              {listing.sub_type?.replace(/_/g, ' ')}
             </span>
 
             <h1 className={styles.title}>{listing.name}</h1>
@@ -281,6 +289,16 @@ export default function ListingDetailPage() {
               </div>
             )}
 
+            {/* request button */}
+            <div className={styles.requestSection}>
+              <button
+                onClick={() => setShowRequestForm(true)}
+                className={styles.requestBtn}
+              >
+                Request This Item
+              </button>
+            </div>
+
             {/* seller info */}
             <div className={styles.sellerSection}>
               <h3 className={styles.sectionTitle}>About the Seller</h3>
@@ -309,6 +327,16 @@ export default function ListingDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* request form modal */}
+      {showRequestForm && listing && (
+        <RequestFormModal
+          listingId={listing.id}
+          listingName={listing.name}
+          sellerProfileId={listing.seller_profile_id}
+          onClose={() => setShowRequestForm(false)}
+        />
+      )}
     </div>
   );
 }

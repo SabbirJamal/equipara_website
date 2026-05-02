@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { Bell, MessageSquare, User, ChevronDown, LogOut, Package, Heart } from 'lucide-react';
 import styles from './SmartHeader.module.css';
+import { supabase } from '@/lib/supabase/client';
 
 
 interface SmartHeaderProps {
@@ -20,7 +21,8 @@ export default function SmartHeader({ currentView, onSwitchView }: SmartHeaderPr
 
   const handleLogout = async () => {
     setProfileOpen(false);
-    await signOut();
+    await supabase.auth.signOut();
+    window.location.href = '/';
   };
 
   const handleSwitchClick = () => {

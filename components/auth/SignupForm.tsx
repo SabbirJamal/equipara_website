@@ -75,38 +75,47 @@ export default function SignupForm() {
 
     setLoading(true);
     
-    try {
-      // Step 1: Sign up with Supabase Auth
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.password,
-      });
+try {
+  console.log('starting signup...');
+  
+  // Step 1: Sign up with Supabase Auth
+  const { data: authData, error: authError } = await supabase.auth.signUp({
+    email: formData.email,
+    password: formData.password,
+  });
 
-      if (authError) throw authError;
+  console.log('auth response:', authData, authError);
 
-      if (!authData.user) {
-        throw new Error('No user returned from signup');
-      }
+  if (authError) throw authError;
 
-      // Step 2: Create user profile using secure function
-      const { error: profileError } = await supabase.rpc('create_user_profile', {
-        user_id: authData.user.id,
-        user_full_name: formData.fullName,
-        user_phone: formData.phone,
-        user_country: formData.country,
-        user_city: formData.city,
-      });
+  if (!authData.user) {
+    throw new Error('No user returned from signup');
+  }
 
-      if (profileError) throw profileError;
+  console.log('user created, id:', authData.user.id);
 
-      alert('Registration successful!');
-      router.push('/login');
-      
-    } catch (error: any) {
-      alert(error.message || 'An error occurred during signup');
-    } finally {
-      setLoading(false);
-    }
+  // Step 2: Create user profile
+  const { error: profileError } = await supabase.rpc('create_user_profile', {
+    user_id: authData.user.id,
+    user_full_name: formData.fullName,
+    user_phone: formData.phone,
+    user_country: formData.country,
+    user_city: formData.city,
+  });
+
+  console.log('profile response:', profileError);
+
+  if (profileError) throw profileError;
+
+  alert('Registration successful!');
+  router.push('/');
+  
+} catch (error: any) {
+  console.error('signup error:', error);
+  alert(error.message || 'An error occurred during signup');
+} finally {
+  setLoading(false);
+}
   };
 
   const handleChange = (field: keyof SignupFormData) => (

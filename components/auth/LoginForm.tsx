@@ -66,7 +66,7 @@ export default function LoginForm() {
         
         if (session) {
           console.log('session active, redirecting...');
-          window.location.href = '/dashboard';
+          window.location.href = '/';
         } else {
           console.log('no session yet, trying again...');
           // try one more time
