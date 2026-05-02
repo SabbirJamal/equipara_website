@@ -7,6 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Bell, MessageSquare, User, ChevronDown, LogOut, Package, Heart } from 'lucide-react';
 import styles from './SmartHeader.module.css';
 import { supabase } from '@/lib/supabase/client';
+import NotificationBell from '@/components/layout/NotificationBell';
 
 
 interface SmartHeaderProps {
@@ -119,8 +120,9 @@ export default function SmartHeader({ currentView, onSwitchView }: SmartHeaderPr
 
         {/* right: icons */}
         <div className={styles.iconGroup}>
+          <NotificationBell />
           <button className={styles.iconBtn}>
-            <Bell className="w-5 h-5" />
+            <MessageSquare className="w-5 h-5" />
           </button>
 
             {/* heart - new */}
@@ -173,6 +175,18 @@ export default function SmartHeader({ currentView, onSwitchView }: SmartHeaderPr
                       My Listings
                     </button>
                   )}
+
+                  {/* orders gyper link */}
+                  <button 
+                    className={styles.dropdownItem}
+                    onClick={() => {
+                      setProfileOpen(false);
+                      router.push('/orders');
+                    }}
+                  >
+                    <Package className="w-4 h-4" />
+                    Orders
+                  </button>
 
                   {(profile.is_buyer && profile.is_seller) || 
                    (!profile.is_seller && currentView === 'buyer') ? (
